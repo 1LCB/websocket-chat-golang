@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F5F5F5;
+            padding: 10px;
+        }
+        #chatbox {
+            width: 300px;
+            height: 300px;
+            border: 1px solid #999;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #FFF;
+            overflow: auto;
+        }
+        #message, #username {
+            width: 300px;
+            padding: 5px;
+            border: 1px solid #999;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <input id="username" type="text" placeholder="Digite seu nome de usuário aqui">
+    <div id="chatbox"></div>
+    <input id="message" type="text" placeholder="Digite sua mensagem aqui">
+
+    <button id="btn-connect" onclick="connect()">Connect</button>
+    <script>
+
+    function connect() {
+        var username = document.getElementById("username").value
+        var btn = document.getElementById("btn-connect")
+
+        var ws = new WebSocket(`ws://localhost:80/ws?username=${username}`);
+        var chatbox = document.getElementById('chatbox');
+        var messageInput = document.getElementById('message');
+        var usernameInput = document.getElementById('username');
+
+
+        ws.onmessage = function(event) {
+            console.log(event.data)
+            
+            var message = document.createElement('div');
+            message.textContent = event.data;
+            chatbox.appendChild(message);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        };
+
+        messageInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && usernameInput.value) {
+                var msg = usernameInput.value + ': ' + messageInput.value;
+                ws.send(msg);
+                messageInput.value = '';
+            }
+        });
+
+        btn.setAttribute("disabled", "")
+
+    }
+    </script>
+</body>
+</html>
